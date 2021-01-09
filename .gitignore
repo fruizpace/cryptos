@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+movements/__pycache__/
+.env
+.vscode/
+movements/data/basededatos.db
+config.py
+probatina.py

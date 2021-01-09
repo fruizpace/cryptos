@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block titulo %} Movimientos {% endblock %}
+
+{% block resumen %}
+<style>
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    td, th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+    </style>
+
+
+<div>
+    <h1>Tabla de Movimientos</h1>
+</div>
+
+<div>
+    <table>
+        <tr>
+            <th class='date'>Fecha</th>
+            <th class='time'>Hora</th>
+            <th class='from_currency'>From</th>
+            <th class='from_quantity'>Q</th>
+            <th class='to_currency'>To</th>
+            <th class='to_quantity'>Q</th>
+            <th class='precio_unitario_to'>P.U.</th>
+        </tr>
+    {% for registro in datos %}
+        <tr>
+            <td>{{ registro['date'] }}</td>
+            <td>{{ registro['time'] }}</td>
+            <td>{{ registro['from_currency'] }}</td>
+            <td>{{ registro['from_quantity'] }}</td>
+            <td>{{ registro['to_currency'] }}</td>
+            <td>{{ registro['to_quantity'] }}</td>
+            <td>{{ registro['precio_unitario_to'] }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+
+<head>
+    <h2>Monedero</h2>
+</head>
+
+<table>
+    <tr>
+        <td>Resumen de monedas disponibles</td>
+    </tr>
+</table>
+
+<div>
+    <form action="/status">
+        <input type="submit" value="Status"/>
+    </form>
+</div>
+
+<div>
+    <form action="/purchase">
+        <input type="submit" value="PLUS"/>
+    </form>
+</div>
+
+{% endblock %}

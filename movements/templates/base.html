@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> myCRYPTO - {% block titulo %}{% endblock %}</title>
+    </head>
+
+    <body>
+        <header data-theme="dark">
+            <div class="header_mycripto"> myCRYPTO </div>
+            <nav> <!-- contiene enlaces de navegación -->
+                <ul>
+                    <li><a href="/"> Inicio </a></li>
+                    <li><a href="/purchase"> Compra </a></li>
+                    <li><a href="/status"> Status </a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="container">
+            {% block resumen %}{% endblock %} 
+        </div>
+<br><br>
+        <footer data-theme="dark">
+            &copy; 2020 - Todos los derechos reservados
+        </footer>
+    </body>
+</html>

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block titulo %} Estado {% endblock %}
+
+{% block resumen %}
+    <h1>ESTADO DE LA INVERSIÓN</h1>
+    <table>
+        <tr>
+            <td>Invertido:</td>
+            <td> {{ invertido }} €</td>
+        </tr>
+        <tr>
+            <td>Valor actual: </td>
+            <td>{{ actual }} €</td>
+        </tr>
+    </table>
+<br><br>
+    <div>
+        <form action="/">
+            <input type="submit" value="Volver"/>
+        </form>
+    </div>
+<br><br>
+<p>{{ monedero }}</p>
+<br><br>
+<p>{{ monedero_eur }}</p>
+{% endblock %}

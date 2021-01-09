@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block titulo %} Compras {% endblock %}
+
+{% block resumen %}
+    <h1>COMPRA DE CRIPTOS</h1>
+    <form action="/purchase" method="POST">
+        <table>
+            <tr>
+                <td> From: </td>
+                <td>  Caja para el from </td>
+                <td> Espacio vacío </td>
+                <td> To:  </td>
+                <td> Caja para To </td>
+            </tr>
+            <tr>
+                <td> Q: </td>
+                <td>  Caja para  Q </td>
+                <td> Botón calcular </td>
+                <td> Q:  </td>
+                <td> Caja para Q2 </td>
+            </tr>
+            <tr>
+                <td colspan="3"> Espacio vacío </td>
+                <td> P.U.: </td>
+                <td> Caja para precio </td>
+            </tr>
+        </table>
+    </form>
+<br><br>
+    <div>
+        <form action="/">
+            <input type="submit" value="Limpiar el formulario"/>
+        </form>
+    </div>
+
+    <div>
+        <form action="/">
+            <input type="submit" value="OK: se grabará el movimiento en la tabla SQL"/>
+        </form>
+    </div>
+{% endblock %}
