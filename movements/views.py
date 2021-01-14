@@ -1,7 +1,9 @@
 from movements import app
+from movements.forms import MovementForm
 from flask import Flask, render_template, request, url_for, redirect
 import sqlite3
 from datetime import date
+import time
 
 import requests
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
@@ -15,6 +17,7 @@ def consulta(query, params=()):
     conn = sqlite3.connect(DBFILE)
     c = conn.cursor()
     c.execute(query, params)
+    conn.commit()
     filas = c.fetchall()
     conn.close
     
@@ -47,45 +50,58 @@ def peticionAPI(specific_url):
         print(e)
 
 
-
 @app.route('/')
 def listaMovimientos():
     # mostrar tabla SQL
     query = "SELECT date, time, from_currency, from_quantity, to_currency, to_quantity, from_quantity/to_quantity as precio_unitario_to FROM movements;"
     compras = consulta(query)
-    
+        
     for d in compras:
         d['from_quantity'] = "{:.2f}".format(float(d['from_quantity']))
         d['to_quantity'] = "{:.2f}".format(float(d['to_quantity']))
         d['precio_unitario_to'] = str("{:.4f}".format(float(d['precio_unitario_to']))) + ' ' + d['from_currency']
-    
-    
+        
     return render_template('movementsList.html', datos=compras)
 
 
 @app.route('/purchase', methods=['GET', 'POST'])
 def purchase():
-    
     if request.method == 'GET':
-        print('soy un get')
-    else:
-        print('soy un post')
+        form_vacio = MovementForm()
+        print('es un GET')
+        
+        return render_template('purchase.html', form=form_vacio, vacio='yes')
     
-    # para obtener precio unitario (¿CUANTOS EUROS CUESTA 1 BTC?)
-    simbolo = 'BTC'
-    amount = 1 
-    convert = 'EUR'
-
-    url = 'https://pro-api.coinmarketcap.com/v1/tools/price-conversion?amount={}&symbol={}&convert={}&CMC_PRO_API_KEY={}'.format(amount, simbolo, convert, API_KEY)
-    dicc = peticionAPI(url)
-    print(dicc['data']['quote']['EUR']['price'])
-    
-    
-    
-    
-    # obtener datos del formulario
-    # query: GRABAR datos en la bd SQL
-    return render_template('purchase.html')
+    else: #request.method == 'POST':
+        form = MovementForm() 
+        if  request.form.get('submit') == 'Grabar' and form.validate():
+            print('GRABAR SQL')
+            
+            query = "INSERT INTO movements (date, time, from_currency, from_quantity, to_currency, to_quantity) VALUES (?,?,?,?,?,?);"
+            consulta(query, (request.form.get("date"), request.form.get("time"), request.form.get("from_currency"),
+                            request.form.get("from_quantity"), request.form.get("to_currency"), request.form.get("to_quantity")))
+            
+            return redirect(url_for('listaMovimientos'))
+        else:
+            print('soy CALCULAR')
+            
+            amount = request.form.get('from_quantity') # x "simbolo" convierte a "convert"
+            simbolo = request.form.get('from_currency') 
+            convert = request.form.get('to_currency')
+            
+            if simbolo == convert: # AÑADIR MENSAJE DE ERROR!!!!
+                print ("FROM y TO deben ser diferentes")
+                return render_template('purchase.html', form=form, vacio='yes')
+            
+            url = 'https://pro-api.coinmarketcap.com/v1/tools/price-conversion?amount={}&symbol={}&convert={}&CMC_PRO_API_KEY={}'.format(amount, simbolo, convert, API_KEY)
+            dicc = peticionAPI(url)
+            q_to = dicc['data']['quote'][convert]['price'] # cantidad de monedas que podemos comprar (viene del API)
+            precioUnitario = float(amount)/q_to
+            
+            fecha_compra = time.strftime("%d/%m/%Y")
+            hora_compra = time.strftime("%X")
+            
+            return render_template('purchase.html', vacio='no', form=form, q_to=q_to, precioUnitario=precioUnitario, fecha_compra=fecha_compra, hora_compra=hora_compra, amount=amount, simbolo=simbolo, convert=convert)
 
 
 @app.route('/status')
@@ -93,30 +109,31 @@ def status():
     # 1)
     query1 = "SELECT SUM(from_quantity) as eur_from FROM movements WHERE from_currency='EUR';"
     total_diccionario = consulta(query1)
-    total_eur_invertido = total_diccionario[0]['eur_from'] # string! PASAR A FLOAT!!! o usar eval
+    total_eur_invertido = total_diccionario[0]['eur_from'] 
     
     #2)
     query2 = 'SELECT sum(case when to_currency = "EUR" then to_quantity else 0 end) - sum(case when  from_currency = "EUR" then from_quantity else 0 end) as saldo_eur from movements;'
     eur_diccionario = consulta(query2)
     saldo_euros_invertidos = eur_diccionario[0]['saldo_eur']
     
-    
-    #2.5) obtener precio unitario en EUR  de todas las criptomonedas:
-    '''
-    simbolo = 'BTC'
-    amount = 1 # para obtener precio unitario (¿CUANTOS EUROS CUESTA 1 BTC?)
+    #3) obtener precio unitario en EUR  de todas las criptomonedas:
+    simbolo = "BTC,ETH,XRP,LTC,BCH,BNB,USDT,EOS,BSV,XLM,ADA,TRX"
     convert = 'EUR'
 
-    url = 'https://pro-api.coinmarketcap.com/v1/tools/price-conversion?amount={}&symbol={}&convert={}&CMC_PRO_API_KEY={}'.format(amount, simbolo, convert, API_KEY)
+    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol={}&convert={}&CMC_PRO_API_KEY={}'.format(simbolo, convert, API_KEY)
     dicc = peticionAPI(url)
-    print(dicc['data']['quote']['EUR']['price'])
-    '''
-    
-    #3)
+    #print(dicc)
     lista_monedas = ['BTC', 'ETH', 'XRP', 'LTC', 'BCH','BNB', 'USDT','EOS','BSV','XLM','ADA','TRX']
-    pu_crypto_eur = {'BTC':'8000.14', 'ETH':'159.3656', 'XRP':'322.1', 'LTC':'54.5198', 'BCH':'0.0006','BNB':'5400.23', 'USDT':'2.3','EOS':'0.09','BSV':'1.33','XLM':'0.9','ADA':'0.002','TRX':'2.6'}
-    monedero = {}
-    monedero_eur = []
+    pu_crypto_eur = {}
+    
+    for moneda in lista_monedas: # crear diccionario pu_crypto_eur
+        precio = dicc['data'][moneda]['quote']['EUR']['price']
+        pu_crypto_eur[moneda] = precio
+    #print(pu_crypto_eur)
+    
+    #4)
+    monedero = {} # cuantas monedas tengo de cada cripto
+    monedero_eur = [] # valor en EUR de las monedas que tengo
     
     for moneda in lista_monedas:
         query3 = "SELECT sum(case when to_currency = ? then to_quantity else 0 end) - sum(case when  from_currency = ? then from_quantity else 0 end) as saldo_moneda FROM movements;"
@@ -128,12 +145,10 @@ def status():
         precio_unitario = float(pu_crypto_eur[moneda])
         monedero_eur.append(saldo * precio_unitario)
     
-    #4)
     valor_total_cryptos = 0
     for item in monedero_eur:
         valor_total_cryptos += item
     
     valor_actual = total_eur_invertido + saldo_euros_invertidos + valor_total_cryptos # todo en euros!
-    
     
     return render_template('status.html', invertido="{:.2f}".format(total_eur_invertido) , actual="{:.2f}".format(valor_actual), monedero=monedero, monedero_eur=monedero_eur)

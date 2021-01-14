@@ -3,40 +3,66 @@
 {% block titulo %} Compras {% endblock %}
 
 {% block resumen %}
-    <h1>COMPRA DE CRIPTOS</h1>
+    <h1 style="text-align: center;">COMPRA DE CRIPTOS</h1>
     <form action="/purchase" method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="field">
         <table>
             <tr>
-                <td> From: </td>
-                <td>  Caja para el from </td>
-                <td> Espacio vacío </td>
-                <td> To:  </td>
-                <td> Caja para To </td>
+                <td> {{form.from_currency.label}} </td>
+
+                {% if vacio == 'no' %}
+                <td>  {{ form.from_currency }} </td> <!-- NO FUNCIONA!!!  si se pulsa GRABAR, la moneda FROM ya no podrá modificarse -->
+                {% else %}
+                <td> {{ form.from_currency }} </td>
+                {% endif %}
+
+                <td>  </td>
+                <td> {{form.to_currency.label}}  </td>
+                <td> {{form.to_currency}} </td>
             </tr>
+            
             <tr>
-                <td> Q: </td>
-                <td>  Caja para  Q </td>
-                <td> Botón calcular </td>
-                <td> Q:  </td>
-                <td> Caja para Q2 </td>
+                <td> {{form.from_quantity.label}} </td>
+                <td>  {{form.from_quantity(placeholder='Entre la cantidad')}} </td>
+                <td> <input type="submit" name="submit" value="Calcular"> </td>
+                
+                <td> {{form.to_quantity.label}}  </td>
+                {% if vacio == 'yes' %}
+                    <td>  ______________ </td>
+                {% else %}
+                    <td> {{ form.to_quantity(value=q_to) }} </td>
+                {% endif %}
             </tr>
+            
+            
             <tr>
-                <td colspan="3"> Espacio vacío </td>
-                <td> P.U.: </td>
-                <td> Caja para precio </td>
+                <td colspan="3">  </td>
+                <td> {{form.precio_unitario_to.label}} </td>
+                {% if vacio == 'yes' %}
+                    <td>  ______________ </td>
+                {% else %}
+                    <td> {{ form.precio_unitario_to(value=precioUnitario) }} </td>
+                {% endif %}
             </tr>
         </table>
+        </div>
+
+        <p hidden>La fecha y hora de la compra es: {{form.date(value=fecha_compra) }} a las {{form.time(value=hora_compra)}}</p>
+
+        <br><br>
+        <div class='field'>
+            <input type="submit" name="submit" value="Grabar">
+        </div>
     </form>
-<br><br>
+
+
+    <br><br>
     <div>
-        <form action="/">
+        <form action="/purchase">
             <input type="submit" value="Limpiar el formulario"/>
         </form>
     </div>
-
-    <div>
-        <form action="/">
-            <input type="submit" value="OK: se grabará el movimiento en la tabla SQL"/>
-        </form>
-    </div>
 {% endblock %}
+

@@ -23,54 +23,60 @@
 
 
 <div>
-    <h1>Tabla de Movimientos</h1>
+    <h1 style="text-align: center;">MOVIMIENTOS</h1>
 </div>
 
 <div>
+    {% if datos | length > 0 %}
+        <table>
+            <tr>
+                <th class='date'>Fecha</th>
+                <th class='time'>Hora</th>
+                <th class='from_currency'>From</th>
+                <th class='from_quantity'>Q</th>
+                <th class='to_currency'>To</th>
+                <th class='to_quantity'>Q</th>
+                <th class='precio_unitario_to'>P.U.</th>
+            </tr>
+        {% for registro in datos %}
+            <tr>
+                <td>{{ registro['date'] }}</td>
+                <td>{{ registro['time'] }}</td>
+                <td>{{ registro['from_currency'] }}</td>
+                <td>{{ registro['from_quantity'] }}</td>
+                <td>{{ registro['to_currency'] }}</td>
+                <td>{{ registro['to_quantity'] }}</td>
+                <td>{{ registro['precio_unitario_to'] }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% else %}
+        <p>Sin movimientos.</p>
+    </div>
+    {% endif %}
+
+    <head>
+        <h2>Monedero</h2>
+    </head>
+    
     <table>
         <tr>
-            <th class='date'>Fecha</th>
-            <th class='time'>Hora</th>
-            <th class='from_currency'>From</th>
-            <th class='from_quantity'>Q</th>
-            <th class='to_currency'>To</th>
-            <th class='to_quantity'>Q</th>
-            <th class='precio_unitario_to'>P.U.</th>
+            <td>Resumen de monedas disponibles</td>
         </tr>
-    {% for registro in datos %}
-        <tr>
-            <td>{{ registro['date'] }}</td>
-            <td>{{ registro['time'] }}</td>
-            <td>{{ registro['from_currency'] }}</td>
-            <td>{{ registro['from_quantity'] }}</td>
-            <td>{{ registro['to_currency'] }}</td>
-            <td>{{ registro['to_quantity'] }}</td>
-            <td>{{ registro['precio_unitario_to'] }}</td>
-        </tr>
-    {% endfor %}
     </table>
-</div>
-
-<head>
-    <h2>Monedero</h2>
-</head>
-
-<table>
-    <tr>
-        <td>Resumen de monedas disponibles</td>
-    </tr>
-</table>
-
-<div>
-    <form action="/status">
-        <input type="submit" value="Status"/>
-    </form>
-</div>
-
-<div>
-    <form action="/purchase">
-        <input type="submit" value="PLUS"/>
-    </form>
-</div>
+    <br><br>
+    <div style="text-align: left;">
+        <form action="/status">
+            <input type="submit" value="Status"/>
+        </form>
+    </div>
+    
+    <div style="text-align: right;">
+        <form action="/purchase">
+            <input type="submit" value="PLUS"/>
+        </form>
+    </div>
 
 {% endblock %}
+
+
