@@ -10,25 +10,22 @@
         <div class="field">
         <table>
             <tr>
-                <td> {{form.from_currency.label}} </td>
-
-                {% if vacio == 'no' %}
-                <td>  {{ form.from_currency }} </td> <!-- NO FUNCIONA!!!  si se pulsa GRABAR, la moneda FROM ya no podrá modificarse -->
-                {% else %}
-                <td> {{ form.from_currency }} </td>
-                {% endif %}
-
+                <td> {{form.from_currency.label}}:  </td>
+                <td>  {{ form.from_currency }} </td> 
                 <td>  </td>
-                <td> {{form.to_currency.label}}  </td>
-                <td> {{form.to_currency}} </td>
+                <td> {{form.to_currency.label}}:   </td>
+                <td>  {{ form.to_currency }} </td> 
             </tr>
             
             <tr>
-                <td> {{form.from_quantity.label}} </td>
-                <td>  {{form.from_quantity(placeholder='Entre la cantidad')}} </td>
-                <td> <input type="submit" name="submit" value="Calcular"> </td>
+                <td> {{form.from_quantity.label}}:  </td>
+                <td>  {{form.from_quantity(placeholder='Entre una cantidad válida')}} </td>
+                    {% for msg in form.from_quantity.errors %}
+                        <p class='error'> {{ msg }} </p>
+                    {% endfor %}
+                <td> <div class='btn'> <input type="submit" name="submit" value="Calcular"></div> </td>
                 
-                <td> {{form.to_quantity.label}}  </td>
+                <td> {{form.to_quantity.label}}:   </td>
                 {% if vacio == 'yes' %}
                     <td>  ______________ </td>
                 {% else %}
@@ -39,7 +36,7 @@
             
             <tr>
                 <td colspan="3">  </td>
-                <td> {{form.precio_unitario_to.label}} </td>
+                <td> {{form.precio_unitario_to.label}}:  </td>
                 {% if vacio == 'yes' %}
                     <td>  ______________ </td>
                 {% else %}
@@ -48,11 +45,28 @@
             </tr>
         </table>
         </div>
+        
+        <br>
+        {% if error_moneda_igual %}
+        <p class=error style="color: red;"><strong>Error:</strong> {{ error_moneda_igual }}
+        {% endif %}
+
+        {% if error_cantidad %}
+        <p class=error style="color: red;"><strong>Error:</strong> {{ error_cantidad }}
+        {% endif %}
+
+        {% if error_eur_btc %}
+        <p class=error style="color: red;"><strong>Error:</strong> {{ error_eur_btc }}
+        {% endif %}   
+
+        {% if error_cripto_eur %}
+        <p class=error style="color: red;"><strong>Error:</strong> {{ error_cripto_eur }}
+        {% endif %}  
 
         <p hidden>La fecha y hora de la compra es: {{form.date(value=fecha_compra) }} a las {{form.time(value=hora_compra)}}</p>
 
         <br><br>
-        <div class='field'>
+        <div class='btn'>
             <input type="submit" name="submit" value="Grabar">
         </div>
     </form>

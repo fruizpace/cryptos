@@ -50,6 +50,16 @@ def peticionAPI(specific_url):
         print(e)
 
 
+def calc_monedero():
+    lista_monedas = ['BTC', 'ETH', 'XRP', 'LTC', 'BCH','BNB', 'USDT','EOS','BSV','XLM','ADA','TRX']
+    monedero = {} # cuantas monedas tengo de cada cripto
+    for moneda in lista_monedas:
+        query = "SELECT sum(case when to_currency = ? then to_quantity else 0 end) - sum(case when  from_currency = ? then from_quantity else 0 end) as saldo_moneda FROM movements;"
+        tmp = consulta(query, (moneda, moneda))
+        saldo = tmp[0]['saldo_moneda']
+        monedero[moneda] = saldo
+    return monedero
+
 @app.route('/')
 def listaMovimientos():
     # mostrar tabla SQL
@@ -60,20 +70,34 @@ def listaMovimientos():
         d['from_quantity'] = "{:.2f}".format(float(d['from_quantity']))
         d['to_quantity'] = "{:.2f}".format(float(d['to_quantity']))
         d['precio_unitario_to'] = str("{:.4f}".format(float(d['precio_unitario_to']))) + ' ' + d['from_currency']
-        
-    return render_template('movementsList.html', datos=compras)
+    
+    monedero_actual = calc_monedero()
+    
+    return render_template('movementsList.html', datos=compras, monedero=monedero_actual)
 
 
 @app.route('/purchase', methods=['GET', 'POST'])
 def purchase():
     if request.method == 'GET':
         form_vacio = MovementForm()
+        monedero = calc_monedero()
+        
+        lista_from = ['EUR'] # crear una lista de monedas disponibles para FROM: EUR + las que tengan cantidad > 0 en mi monedero
+        for moneda, q in monedero.items():
+            if q>0:
+                lista_from.append(moneda)
+        
+        form_vacio.from_currency.choices = lista_from
+        
         print('es un GET')
         
         return render_template('purchase.html', form=form_vacio, vacio='yes')
     
     else: #request.method == 'POST':
-        form = MovementForm() 
+        form = MovementForm()
+        form.from_currency.choices = [request.form.get('from_currency')] # bloqueamos la lista con  la moneda elegida
+        form.to_currency.choices = [request.form.get('to_currency')] # bloqueamos la lista con  la moneda elegida
+        
         if  request.form.get('submit') == 'Grabar' and form.validate():
             print('GRABAR SQL')
             
@@ -89,9 +113,22 @@ def purchase():
             simbolo = request.form.get('from_currency') 
             convert = request.form.get('to_currency')
             
-            if simbolo == convert: # AÑADIR MENSAJE DE ERROR!!!!
-                print ("FROM y TO deben ser diferentes")
-                return render_template('purchase.html', form=form, vacio='yes')
+            if float(amount) <= 0:
+                error = 'La cantidad debe ser superior a 0.'
+                return render_template('purchase.html', form=form, vacio='yes', error_cantidad=error)
+            
+            if simbolo == convert:
+                error = 'Las monedas From y To deben ser diferentes.'
+                return render_template('purchase.html', form=form, vacio='yes', error_moneda_igual=error)
+            
+            if simbolo == 'EUR' and convert != 'BTC':
+                error = 'Con EUR sólo puedes comprar BTC.'
+                return render_template('purchase.html', form=form, vacio='yes', error_eur_btc=error)
+            
+            if simbolo != 'BTC' and convert == 'EUR':
+                error = 'Sólo puedes comprar EUR con BTC.'
+                return render_template('purchase.html', form=form, vacio='yes', error_cripto_eur=error)
+            
             
             url = 'https://pro-api.coinmarketcap.com/v1/tools/price-conversion?amount={}&symbol={}&convert={}&CMC_PRO_API_KEY={}'.format(amount, simbolo, convert, API_KEY)
             dicc = peticionAPI(url)
@@ -101,7 +138,7 @@ def purchase():
             fecha_compra = time.strftime("%d/%m/%Y")
             hora_compra = time.strftime("%X")
             
-            return render_template('purchase.html', vacio='no', form=form, q_to=q_to, precioUnitario=precioUnitario, fecha_compra=fecha_compra, hora_compra=hora_compra, amount=amount, simbolo=simbolo, convert=convert)
+            return render_template('purchase.html', vacio='no', form=form, q_to=q_to, precioUnitario=precioUnitario, fecha_compra=fecha_compra, hora_compra=hora_compra)
 
 
 @app.route('/status')

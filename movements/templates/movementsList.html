@@ -55,15 +55,21 @@
     </div>
     {% endif %}
 
+<br><br>
     <head>
-        <h2>Monedero</h2>
+        <h2>Monedero (criptomonedas disponibles) </h2>
     </head>
     
     <table>
         <tr>
-            <td>Resumen de monedas disponibles</td>
+            {% for moneda, cantidad in monedero.items() %}
+                {% if cantidad > 0 %}
+                    <ul>{{moneda}} = {{ cantidad }}</ul>
+                {% endif %}
+            {% endfor %}
         </tr>
     </table>
+
     <br><br>
     <div style="text-align: left;">
         <form action="/status">
