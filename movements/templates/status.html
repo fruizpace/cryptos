@@ -14,14 +14,15 @@
             <td>{{ actual }} €</td>
         </tr>
     </table>
+
+    {% if error_conexion %}
+    <p class=error style="color: red;"><strong>Error:</strong> {{ error_conexion }}
+    {% endif %}  
+
 <br><br>
     <div>
         <form action="/">
             <input type="submit" value="Volver"/>
         </form>
     </div>
-<br><br>
-<p>{{ monedero }}</p>
-<br><br>
-<p>{{ monedero_eur }}</p>
 {% endblock %}

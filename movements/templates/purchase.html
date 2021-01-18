@@ -10,22 +10,22 @@
         <div class="field">
         <table>
             <tr>
-                <td> {{form.from_currency.label}}:  </td>
+                <td> {{form.from_currency.label}}  </td>
                 <td>  {{ form.from_currency }} </td> 
                 <td>  </td>
-                <td> {{form.to_currency.label}}:   </td>
+                <td> {{form.to_currency.label}}   </td>
                 <td>  {{ form.to_currency }} </td> 
             </tr>
             
             <tr>
-                <td> {{form.from_quantity.label}}:  </td>
+                <td> {{form.from_quantity.label}}  </td>
                 <td>  {{form.from_quantity(placeholder='Entre una cantidad válida')}} </td>
                     {% for msg in form.from_quantity.errors %}
                         <p class='error'> {{ msg }} </p>
                     {% endfor %}
                 <td> <div class='btn'> <input type="submit" name="submit" value="Calcular"></div> </td>
                 
-                <td> {{form.to_quantity.label}}:   </td>
+                <td> {{form.to_quantity.label}}  </td>
                 {% if vacio == 'yes' %}
                     <td>  ______________ </td>
                 {% else %}
@@ -61,7 +61,12 @@
 
         {% if error_cripto_eur %}
         <p class=error style="color: red;"><strong>Error:</strong> {{ error_cripto_eur }}
-        {% endif %}  
+        {% endif %}
+
+        {% if error_conexion %}
+        <p class=error style="color: red;"><strong>Error:</strong> {{ error_conexion }}
+        {% endif %}
+
 
         <p hidden>La fecha y hora de la compra es: {{form.date(value=fecha_compra) }} a las {{form.time(value=hora_compra)}}</p>
 
@@ -71,12 +76,24 @@
         </div>
     </form>
 
-
     <br><br>
     <div>
         <form action="/purchase">
             <input type="submit" value="Limpiar el formulario"/>
         </form>
+    </div>
+
+        <h2>Monedero: </h2>
+    <div class="lista">
+        {% if monedero == 'vacio' %}
+            <p class="mensaje" style="color:blue;"> <strong>Primera compra:</strong> Use Euros (EUR) para obtener Bitcoins (BTC). </p>
+        {% else %}
+            {% for moneda, cantidad in monedero.items() %}
+                {% if cantidad > 0 %}
+                    <li>{{moneda}} = {{ "{:,.3f}".format(cantidad) }}</li>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
     </div>
 {% endblock %}
 

@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired, Length, NumberRange, InputRequired
 import time
 
 class MovementForm(FlaskForm):
-    lista_monedas = ['EUR','BTC','ADA','BCH','BSV','EOS','ETH','LTC','NBN','TRX','USDT','XLM','XRP']
+    lista_monedas = ['EUR','BTC','ADA','BCH','BSV','EOS','ETH','LTC','BNB','TRX','USDT','XLM','XRP']
     from_currency = SelectField('From', choices=[], validators=[DataRequired()])
     from_quantity = FloatField('Q', validators=[InputRequired(), NumberRange(min=0, message='Entrar un valor válido')])
     to_currency =  SelectField('To', choices=lista_monedas, validators=[DataRequired()])
