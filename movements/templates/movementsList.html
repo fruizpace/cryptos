@@ -3,24 +3,49 @@
 {% block titulo %} Movimientos {% endblock %}
 
 {% block resumen %}
-<style>
-    table {
-      font-family: arial, sans-serif;
-      border-collapse: collapse;
-      width: 100%;
-    }
-    
-    td, th {
-      border: 1px solid #dddddd;
-      text-align: left;
-      padding: 8px;
-    }
-    
-    tr:nth-child(even) {
-      background-color: #dddddd;
-    }
-    </style>
 
+<style>  
+.tabla-movementsList {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    }
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 8px;
+    }
+
+td.valores {
+    border: 1px solid #dddddd;
+    position: relative;
+    text-align: right ;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+    }
+
+#botones_inicio {
+    display: inline-block;
+    height: 100px;
+    width: 300px;
+    background: #eee;
+    padding: 20px;
+    text-align: center;
+    }
+#l {
+    float: left;
+}
+#r {
+    float: right;
+}
+
+#space_monedero {
+    margin-top: 150px;
+}
+</style>
 
 <div>
     <h1 style="text-align: center;">MOVIMIENTOS</h1>
@@ -28,61 +53,49 @@
 
 <div>
     {% if datos | length > 0 %}
-        <table>
+        <table class= tabla-movementsList>
             <tr>
-                <th class='date'>Fecha</th>
-                <th class='time'>Hora</th>
-                <th class='from_currency'>From</th>
-                <th class='from_quantity'>Q</th>
-                <th class='to_currency'>To</th>
-                <th class='to_quantity'>Q</th>
-                <th class='precio_unitario_to'>P.U.</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>From</th>
+                <th>Q</th>
+                <th>To</th>
+                <th>Q</th>
+                <th>P.U.</th>
             </tr>
         {% for registro in datos %}
             <tr>
                 <td>{{ registro['date'] }}</td>
                 <td>{{ registro['time'] }}</td>
                 <td>{{ registro['from_currency'] }}</td>
-                <td>{{ "{:,.2f}".format(registro['from_quantity']) }}</td>
+                <td class='valores'>{{ "{:,.2f}".format(registro['from_quantity']) }}</td>
                 <td>{{ registro['to_currency'] }}</td>
-                <td>{{ "{:,.2f}".format(registro['to_quantity']) }}</td>
-                <td>{{ "{:,.4f}".format(registro['precio_unitario_to']) }}</td>
+                <td class='valores'>{{ "{:,.2f}".format(registro['to_quantity']) }}</td>
+                <td class='valores'>{{ "{:,.4f}".format(registro['precio_unitario_to']) }}</td>
             </tr>
         {% endfor %}
         </table>
     {% else %}
-        <p>Sin movimientos.</p>
+        <p style="text-align: center;"><mark background-color: yellow;>Sin movimientos. </mark></p>
     </div>
     {% endif %}
     
-    <br><br>
-    <div style="text-align: left;">
-        <form action="/status">
-            <input type="submit" value="Status"/>
-        </form>
+    <div id='botones_incio'>
+    <a id='l' href="/status" role="button" title="Estado de la inversión"> Status </a> 
+    <a id='r' href="/purchase" role="button" title="Comprar moneda" > <i class="fa fa-plus" aria-hidden="true"></i></a> 
     </div>
     
-    <div style="text-align: right;">
-        <form action="/purchase">
-            <input type="submit" value="PLUS"/>
-        </form>
-    </div>
-
-    <head>
+    <div id='space_monedero'>
+    <hgroup>
         <h2>Monedero: </h2>
-    </head>
-        <div>
-            <p>¿Cuánto tienes de cada criptomoneda?</p>
+        <h3>¿Cuánto tienes de cada criptomoneda?</h3>
+    </hgroup>
             {% for moneda, cantidad in monedero.items() %}
                 {% if cantidad == None %}
                     <p> {{moneda}} = 0 </p>
                 {% elif cantidad > 0 %}
-                    <li>{{moneda}} = {{ "{:,.3f}".format(cantidad) }}</li>
+                    <li> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"> {{moneda}} = {{ "{:,.4f}".format(cantidad) }}</li>
                 {% endif %}
             {% endfor %}
-        </div>
-
-
+    </div>
 {% endblock %}
-
-

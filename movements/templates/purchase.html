@@ -3,94 +3,101 @@
 {% block titulo %} Compras {% endblock %}
 
 {% block resumen %}
+
+<style>
+    #tabla_form {
+        font-family: arial, sans-serif;
+        border: none;
+        width: 100%;
+        }
+    td {
+        vertical-align: center ;
+        border: none;
+    }
+    tr {
+        border: none;
+    }
+    #etiqueta {
+        font-size:larger;
+        vertical-align: text-top;
+    }
+
+</style>
+
     <h1 style="text-align: center;">COMPRA DE CRIPTOS</h1>
     <form action="/purchase" method="POST">
         {{ form.hidden_tag() }}
 
-        <div class="field">
-        <table>
+        <div>
+        <table id="tabla_form">
             <tr>
-                <td> {{form.from_currency.label}}  </td>
+                <td id="etiqueta"> {{form.from_currency.label}}  </td>
                 <td>  {{ form.from_currency }} </td> 
                 <td>  </td>
-                <td> {{form.to_currency.label}}   </td>
+                <td id="etiqueta"> {{form.to_currency.label}}   </td>
                 <td>  {{ form.to_currency }} </td> 
             </tr>
             
             <tr>
-                <td> {{form.from_quantity.label}}  </td>
-                <td>  {{form.from_quantity(placeholder='Entre una cantidad válida')}} </td>
-                    {% for msg in form.from_quantity.errors %}
-                        <p class='error'> {{ msg }} </p>
-                    {% endfor %}
-                <td> <div class='btn'> <input type="submit" name="submit" value="Calcular"></div> </td>
-                
-                <td> {{form.to_quantity.label}}  </td>
-                {% if vacio == 'yes' %}
-                    <td>  ______________ </td>
+                <td id="etiqueta"> {{form.from_quantity.label}}  </td>
+                {% if vacio =='yes' %} 
+                    <td> {{form.from_quantity(placeholder='Entre una cantidad válida')}} </td>
                 {% else %}
-                    <td> {{ form.to_quantity(value=q_to) }} </td>
+                        <td> {{ form.from_quantity(readonly= "True") }} </td>
+                {% endif %}
+                
+                <td> <button name="submit"  type="submit" value="Calcular" title="Calcular"> <i class="fa fa-calculator" aria-hidden="true"> </i> </button> </td>
+                
+                <td id="etiqueta"> {{form.to_quantity.label}}  </td>
+                {% if vacio == 'yes' %}
+                    <td>  ________________________________ </td>
+                {% else %}
+                    <td> {{ form.to_quantity(value =  "{:.4f}".format(q_to) ) }} </td>
                 {% endif %}
             </tr>
             
-            
             <tr>
                 <td colspan="3">  </td>
-                <td> {{form.precio_unitario_to.label}}:  </td>
+                <td id="etiqueta"> {{form.precio_unitario_to.label}}  </td>
                 {% if vacio == 'yes' %}
-                    <td>  ______________ </td>
+                    <td>  ________________________________  </td>
                 {% else %}
-                    <td> {{ form.precio_unitario_to(value=precioUnitario) }} </td>
+                    <td> {{ form.precio_unitario_to(value =  "{:.8f}".format(precioUnitario) ) }} </td>
                 {% endif %}
+            </tr>
+
+            <tr>
+                <td colspan="3">  </td>
+                <td style="vertical-align:top">  <a href="/purchase" role="button" title="Limpiar formulario"> <i class="fa fa-times" aria-hidden="true"></i>
+                </a> </td>
+                <td><button name="submit"  type="submit" value="Grabar" title="Efectuar compra"> <i class="fa fa-check" aria-hidden="true"></i> </button> </td>
             </tr>
         </table>
         </div>
         
-        <br>
-        {% if error_moneda_igual %}
-        <p class=error style="color: red;"><strong>Error:</strong> {{ error_moneda_igual }}
+
+        <div>
+        {% if error %}
+            <p class=error> <mark> <strong>Error:</strong>  {{ error }} </mark>
         {% endif %}
-
-        {% if error_cantidad %}
-        <p class=error style="color: red;"><strong>Error:</strong> {{ error_cantidad }}
-        {% endif %}
-
-        {% if error_eur_btc %}
-        <p class=error style="color: red;"><strong>Error:</strong> {{ error_eur_btc }}
-        {% endif %}   
-
-        {% if error_cripto_eur %}
-        <p class=error style="color: red;"><strong>Error:</strong> {{ error_cripto_eur }}
-        {% endif %}
-
-        {% if error_conexion %}
-        <p class=error style="color: red;"><strong>Error:</strong> {{ error_conexion }}
-        {% endif %}
-
+        </div>
 
         <p hidden>La fecha y hora de la compra es: {{form.date(value=fecha_compra) }} a las {{form.time(value=hora_compra)}}</p>
-
-        <br><br>
-        <div class='btn'>
-            <input type="submit" name="submit" value="Grabar">
-        </div>
     </form>
 
-    <br><br>
     <div>
-        <form action="/purchase">
-            <input type="submit" value="Limpiar el formulario"/>
-        </form>
-    </div>
-
+    <hgroup>
         <h2>Monedero: </h2>
-    <div class="lista">
+        <h3>¿Cuánto tienes de cada criptomoneda?</h3>
+    </hgroup>
         {% if monedero == 'vacio' %}
-            <p class="mensaje" style="color:blue;"> <strong>Primera compra:</strong> Use Euros (EUR) para obtener Bitcoins (BTC). </p>
+            <p style="color:blue;"> <strong>Primera compra:</strong> Use Euros (EUR) para obtener Bitcoins (BTC). </p>
         {% else %}
             {% for moneda, cantidad in monedero.items() %}
-                {% if cantidad > 0 %}
-                    <li>{{moneda}} = {{ "{:,.3f}".format(cantidad) }}</li>
+                {% if cantidad == None %}
+                    <!-- no hagas nada -->
+                {% elif cantidad > 0  %}
+                    <li> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"> {{moneda}} = {{ "{:.4f}".format(cantidad) }}</li>
                 {% endif %}
             {% endfor %}
         {% endif %}

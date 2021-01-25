@@ -5,7 +5,7 @@ import sqlite3
 from datetime import date
 import time
 import requests
-from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+#from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 
 API_KEY =  app.config['API_KEY']
@@ -38,25 +38,50 @@ def consulta(query, params=()):
 
     return listaDeDiccionarios 
 
-
 def peticionAPI(specific_url):
-    response = requests.get(specific_url) #print(response.text)
+    response = requests.get(specific_url)
     if response.status_code == 200:
         api = response.json()
         return api
     else: #(ConnectionError, Timeout, TooManyRedirects) as e:
         raise Exception("Problema de consulta tipo {}".format(response.status_code)) 
 
-
 def calc_monedero():
     lista_monedas = ['BTC','ADA','BCH','BSV','EOS','ETH','LTC','BNB','TRX','USDT','XLM','XRP']
-    monedero = {} # cuantas monedas tengo de cada cripto
+    monedero = {} # cuantas monedas tengo de cada cripto. No incluye EUR.
     for moneda in lista_monedas:
         query = "SELECT sum(case when to_currency = ? then to_quantity else 0 end) - sum(case when  from_currency = ? then from_quantity else 0 end) as saldo_moneda FROM movements;"
         tmp = consulta(query, (moneda, moneda))
         saldo = tmp[0]['saldo_moneda']
         monedero[moneda] = saldo
     return monedero
+
+def validarConversion(amount, simbolo, convert):
+    monedero = calc_monedero()
+    error = None
+    try:
+        if float(amount) <= 0:
+            error = 'Cifra no válida. Entre cantidad superior a 0.'
+            return error
+    except:
+        error = 'Cifra no válida. Use el punto para separar decimales. No se admiten otros símbolos.'
+        return error
+    
+    if simbolo != 'EUR' and monedero[simbolo] < float(amount):
+        error = 'Sólo dispones de {:.3f} {} para gastar.'.format(monedero[simbolo], simbolo)
+        return error
+    
+    if simbolo == convert:
+        error = 'Las monedas From y To deben ser diferentes.'
+        return error
+    
+    if simbolo == 'EUR' and convert != 'BTC':
+        error = 'Con EUR sólo puedes comprar BTC.'
+        return error
+    
+    if simbolo != 'BTC' and convert == 'EUR':
+        error = 'Sólo puedes comprar EUR con BTC.'
+        return error
 
 @app.route('/')
 def listaMovimientos(): # mostrar tabla SQL
@@ -83,8 +108,6 @@ def purchase():
             monedero = 'vacio'
             form_vacio.from_currency.choices = lista_from
         
-        print('es un GET')
-        
         return render_template('purchase.html', form=form_vacio, vacio='yes', monedero=monedero)
     
     else: #2) request.method == 'POST': Grabar o Calcular
@@ -94,9 +117,7 @@ def purchase():
         monedero = calc_monedero()
         
         if  request.form.get('submit') == 'Grabar' and form.validate():
-            try:
-                print('GRABAR SQL')
-                
+            try: 
                 query = "INSERT INTO movements (date, time, from_currency, from_quantity, to_currency, to_quantity) VALUES (?,?,?,?,?,?);"
                 consulta(query, (request.form.get("date"), request.form.get("time"), request.form.get("from_currency"),
                                 request.form.get("from_quantity"), request.form.get("to_currency"), request.form.get("to_quantity")))
@@ -105,50 +126,30 @@ def purchase():
             except:
                 return redirect(url_for('listaMovimientos'))
         else:
-            print('soy CALCULAR')
-            
             amount = request.form.get('from_quantity') # x "simbolo" convierte a "convert"
             simbolo = request.form.get('from_currency') 
             convert = request.form.get('to_currency')
             
             #3) Errores en la conversión de monedas:
-            try:
-                if float(amount) <= 0:
-                    error = 'Cifra no válida. Entre cantidad superior a 0.'
-                    return render_template('purchase.html', form=form, vacio='yes', error_cantidad=error, monedero=monedero)
-            except:
-                error = 'Cifra no válida. Use el punto para separar decimales. No se admiten otros símbolos.'
-                return render_template('purchase.html', form=form, vacio='yes', error_cantidad=error, monedero=monedero)
-            
-            if simbolo != 'EUR' and monedero[simbolo] < float(amount):
-                error = 'Sólo dispones de {:.3f} {} para gastar.'.format(monedero[simbolo], simbolo)
-                return render_template('purchase.html', form=form, vacio='yes', error_cantidad=error, monedero=monedero)
-            
-            if simbolo == convert:
-                error = 'Las monedas From y To deben ser diferentes.'
-                return render_template('purchase.html', form=form, vacio='yes', error_moneda_igual=error, monedero=monedero)
-            
-            if simbolo == 'EUR' and convert != 'BTC':
-                error = 'Con EUR sólo puedes comprar BTC.'
-                return render_template('purchase.html', form=form, vacio='yes', error_eur_btc=error, monedero=monedero)
-            
-            if simbolo != 'BTC' and convert == 'EUR':
-                error = 'Sólo puedes comprar EUR con BTC.'
-                return render_template('purchase.html', form=form, vacio='yes', error_cripto_eur=error, monedero=monedero)
+            error = validarConversion(amount, simbolo, convert)
+            if error != None:
+                return render_template('purchase.html', form=form, vacio='yes', error=error, monedero=monedero)
             
             # 4) Finalmente: consulta a la API
             try:
                 url = 'https://pro-api.coinmarketcap.com/v1/tools/price-conversion?amount={}&symbol={}&convert={}&CMC_PRO_API_KEY={}'.format(amount, simbolo, convert, API_KEY)
                 dicc = peticionAPI(url)
+                
                 q_to = dicc['data']['quote'][convert]['price'] # cantidad de monedas que podemos comprar (viene del API)
                 precioUnitario = float(amount)/q_to
                 
                 fecha_compra = time.strftime("%d/%m/%Y") # fecha y hora del momento de la consulta API
                 hora_compra = time.strftime("%X")
                 
-                return render_template('purchase.html', vacio='no', form=form, q_to="{:.3f}".format(q_to), precioUnitario="{:.8f}".format(precioUnitario), fecha_compra=fecha_compra, hora_compra=hora_compra, monedero=monedero)
+                return render_template('purchase.html', vacio='no', form=form, q_to=q_to, precioUnitario=precioUnitario, hora_compra=hora_compra, fecha_compra=fecha_compra, monedero=monedero, amount=amount)
             except Exception as error:
-                return render_template('purchase.html', vacio='yes', form=form, error_conexion=error, monedero=monedero)
+                print(error) # Failed to establish a new connection
+                return render_template('purchase.html', vacio='yes', form=form, error=error, monedero=monedero)
 
 @app.route('/status')
 def status():
@@ -201,4 +202,4 @@ def status():
     
     valor_actual = total_eur_invertido + saldo_euros_invertidos + valor_total_cryptos # todo en euros!
     
-    return render_template('status.html', invertido="{:.2f}".format(total_eur_invertido) , actual="{:.2f}".format(valor_actual))
+    return render_template('status.html', invertido=total_eur_invertido , actual=valor_actual)

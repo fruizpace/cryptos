@@ -3,26 +3,36 @@
 {% block titulo %} Estado {% endblock %}
 
 {% block resumen %}
-    <h1>ESTADO DE LA INVERSIÓN</h1>
-    <table>
-        <tr>
-            <td>Invertido:</td>
-            <td> {{ invertido }} €</td>
-        </tr>
-        <tr>
-            <td>Valor actual: </td>
-            <td>{{ actual }} €</td>
-        </tr>
-    </table>
+<style>
+    .status {
+        text-align: center;
+        font-size: larger;
+    }
+    .fa-arrow-down {
+        color: red;
+    }
+    .fa-arrow-up {
+        color: green;
+    }
+</style>
+
+    <h1 style="text-align: center;">ESTADO DE LA INVERSIÓN</h1>
+    <div>
+        <p class="status"> <strong> Invertido: </strong>  {{ "{:,.2f}".format(invertido) }}€ </p>
+        {% if actual > invertido %}
+            <p class="status"> <strong> Valor actual: </strong>  {{ "{:,.2f}".format(actual) }}€ 
+            <i class="fa fa-arrow-up" aria-hidden="true"></i> </p> 
+        {% else %}
+            <p class="status"> <strong> Valor actual: </strong>  {{ "{:,.2f}".format(actual) }}€
+            <i class="fa fa-arrow-down" aria-hidden="true"></i> </p> 
+        {% endif %}
+    </div>
 
     {% if error_conexion %}
-    <p class=error style="color: red;"><strong>Error:</strong> {{ error_conexion }}
+    <p class=error> <mark> <strong>Error:</strong> {{ error_conexion }} </mark> </p>
     {% endif %}  
 
 <br><br>
-    <div>
-        <form action="/">
-            <input type="submit" value="Volver"/>
-        </form>
-    </div>
+    <div> <a href="/" role="button" title="Volver al inicio" style="float: right;"> Volver </a> </div>
+<br><br>
 {% endblock %}
