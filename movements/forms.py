@@ -5,7 +5,7 @@ import time
 
 class MovementForm(FlaskForm):
     lista_monedas = ['EUR','BTC','ADA','BCH','BSV','EOS','ETH','LTC','BNB','TRX','USDT','XLM','XRP']
-    from_currency = SelectField('From', choices=[], validators=[DataRequired()])
+    from_currency = SelectField('From', choices=[], validators=[DataRequired()]) # choices=[] lista vacía
     from_quantity = FloatField('Q', validators=[InputRequired()], render_kw={'readonly': False})
     to_currency =  SelectField('To', choices=lista_monedas, validators=[DataRequired()])
     to_quantity = FloatField('Q', render_kw={'readonly': True}) # readonly =  sólo lectura!

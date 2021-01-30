@@ -5,23 +5,18 @@
 {% block resumen %}
 
 <style>
-    #tabla_form {
+    .tabla_form {
         font-family: arial, sans-serif;
-        border: none;
         width: 100%;
         }
     td {
         vertical-align: center ;
         border: none;
     }
-    tr {
-        border: none;
-    }
     #etiqueta {
         font-size:larger;
         vertical-align: text-top;
     }
-
 </style>
 
     <h1 style="text-align: center;">COMPRA DE CRIPTOS</h1>
@@ -29,7 +24,7 @@
         {{ form.hidden_tag() }}
 
         <div>
-        <table id="tabla_form">
+        <table class="tabla_form">
             <tr>
                 <td id="etiqueta"> {{form.from_currency.label}}  </td>
                 <td>  {{ form.from_currency }} </td> 
@@ -50,7 +45,7 @@
                 
                 <td id="etiqueta"> {{form.to_quantity.label}}  </td>
                 {% if vacio == 'yes' %}
-                    <td>  ________________________________ </td>
+                    <td  style="text-align: center;">  ________________________________ </td>
                 {% else %}
                     <td> {{ form.to_quantity(value =  "{:.4f}".format(q_to) ) }} </td>
                 {% endif %}
@@ -60,7 +55,7 @@
                 <td colspan="3">  </td>
                 <td id="etiqueta"> {{form.precio_unitario_to.label}}  </td>
                 {% if vacio == 'yes' %}
-                    <td>  ________________________________  </td>
+                    <td style="text-align: center;">  ________________________________  </td>
                 {% else %}
                     <td> {{ form.precio_unitario_to(value =  "{:.8f}".format(precioUnitario) ) }} </td>
                 {% endif %}
@@ -70,11 +65,10 @@
                 <td colspan="3">  </td>
                 <td style="vertical-align:top">  <a href="/purchase" role="button" title="Limpiar formulario"> <i class="fa fa-times" aria-hidden="true"></i>
                 </a> </td>
-                <td><button name="submit"  type="submit" value="Grabar" title="Efectuar compra"> <i class="fa fa-check" aria-hidden="true"></i> </button> </td>
+                <td> <button name="submit"  type="submit" value="Grabar" title="Efectuar compra"> <i class="fa fa-check" aria-hidden="true"></i> </button> </td>
             </tr>
         </table>
         </div>
-        
 
         <div>
         {% if error %}
