@@ -2,11 +2,12 @@ from movements import app
 from movements.forms import MovementForm
 from flask import Flask, render_template, request, url_for, redirect
 import sqlite3
-from datetime import date
+from datetime import date, datetime
 import time
-import requests
-#from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+import requests #from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
+import numpy as np
+import matplotlib.pyplot as plt
 
 API_KEY =  app.config['API_KEY']
 DBFILE = app.config['DBFILE']
@@ -142,13 +143,12 @@ def purchase():
                 
                 q_to = dicc['data']['quote'][convert]['price'] # cantidad de monedas que podemos comprar (viene del API)
                 precioUnitario = float(amount)/q_to
-                
                 fecha_compra = time.strftime("%d/%m/%Y") # fecha y hora del momento de la consulta API
                 hora_compra = time.strftime("%X")
                 
                 return render_template('purchase.html', vacio='no', form=form, q_to=q_to, precioUnitario=precioUnitario, hora_compra=hora_compra, fecha_compra=fecha_compra, monedero=monedero, amount=amount)
             except Exception as error:
-                print(error) # Failed to establish a new connection
+                #print(error) # Failed to establish a new connection
                 return render_template('purchase.html', vacio='yes', form=form, error=error, monedero=monedero)
 
 @app.route('/status')

@@ -57,7 +57,7 @@
                 {% if vacio == 'yes' %}
                     <td style="text-align: center;">  ________________________________  </td>
                 {% else %}
-                    <td> {{ form.precio_unitario_to(value =  "{:.8f}".format(precioUnitario) ) }} </td>
+                    <td> {{ form.precio_unitario_to(value =  "{:.6f}".format(precioUnitario) ) }} </td>
                 {% endif %}
             </tr>
 
@@ -91,7 +91,7 @@
                 {% if cantidad == None %}
                     <!-- no hagas nada -->
                 {% elif cantidad > 0  %}
-                    <li> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"> {{moneda}} = {{ "{:.4f}".format(cantidad) }}</li>
+                    <li> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"> {{moneda}} = {{ "{:.6f}".format(cantidad) }}</li>
                 {% endif %}
             {% endfor %}
         {% endif %}

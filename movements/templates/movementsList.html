@@ -92,7 +92,7 @@ tr:nth-child(even) {
     </hgroup>
             {% for moneda, cantidad in monedero.items() %}
                 {% if cantidad == None %}
-                    <p> {{moneda}} = 0 </p>
+                    <p> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"> {{moneda}} = 0 </p>
                 {% elif cantidad > 0 %}
                     <li> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"> {{moneda}} = {{ "{:,.4f}".format(cantidad) }}</li>
                 {% endif %}
