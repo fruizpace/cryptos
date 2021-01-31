@@ -20,8 +20,10 @@
     <div>
         <p class="status"> <strong> Invertido: </strong>  {{ "{:,.2f}".format(invertido) }}€ </p>
         {% if actual > invertido %}
-            <p class="status"> <strong> Valor actual: </strong>  {{ "{:,.2f}".format(actual) }}€ 
-            <i class="fa fa-arrow-up" aria-hidden="true"></i> </p> 
+            <p class="status"> <strong> Valor actual: </strong>  {{ "{:,.2f}".format(actual) }}€
+            <i class="fa fa-arrow-up" aria-hidden="true"></i> </p>
+        {% elif actual == invertido %}
+            <p class="status"> <strong> Valor actual: </strong>  {{ "{:,.2f}".format(actual) }}€
         {% else %}
             <p class="status"> <strong> Valor actual: </strong>  {{ "{:,.2f}".format(actual) }}€
             <i class="fa fa-arrow-down" aria-hidden="true"></i> </p> 

@@ -194,7 +194,10 @@ def status():
         monedero[moneda] = saldo
         
         precio_unitario = float(pu_crypto_eur[moneda])
-        monedero_eur.append(saldo * precio_unitario)
+        try:
+            monedero_eur.append(saldo * precio_unitario)
+        except:
+            return render_template('status.html', invertido=0 , actual=0)
     
     valor_total_cryptos = 0
     for item in monedero_eur:

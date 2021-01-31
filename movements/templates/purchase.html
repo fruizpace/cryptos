@@ -80,13 +80,20 @@
     </form>
 
     <div>
-    <hgroup>
-        <h2>Monedero: </h2>
-        <h3>¿Cuánto tienes de cada criptomoneda? <a href="#section2" style="color: black;">[2]</a> </h3>
-    </hgroup>
         {% if monedero == 'vacio' %}
-            <p style="color:blue;"> <strong>Primera compra:</strong> Use Euros (EUR) para obtener Bitcoins (BTC). </p>
+        <p> <mark background-color: yellow;>  <strong>Instrucciones: Leer detenidamente</strong> </mark> </p>
+        <ol>
+            <li> <strong>Primera compra:</strong> Use Euros (EUR) para obtener Bitcoins (BTC). </li>
+            <li> Con el botón <strong>calcular</strong> <i class="fa fa-calculator" aria-hidden="true"> </i> se le informará del precio y cantidad de monedas que puede conseguir. </li>
+            <li> Para borrar el formulario puede usar el botón <strong>limpiar</strong> <i class="fa fa-times" aria-hidden="true"></i>.</li>
+            <li> Para validar la compra pulse <strong>aceptar</strong> <i class="fa fa-check" aria-hidden="true"></i>. El movimiento quedará registrado.</li>
+            <li> <strong>Siguientes compras:</strong> Una vez tenga BTC podrá adquirir otras criptomonedas disponibles en la lista desplegable (To). </li>
+        </ol> 
         {% else %}
+        <hgroup>
+            <h2>Monedero: </h2>
+            <h3>¿Cuánto tienes de cada criptomoneda? <a href="#section2" style="color: black;">[2]</a> </h3>
+        </hgroup>
             {% for moneda, cantidad in monedero.items() %}
                 {% if cantidad == None %}
                     <!-- no hagas nada -->
@@ -94,9 +101,11 @@
                     <li> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"  width="30px" height="30px"> {{moneda}} = {{cantidad}}</li>
                 {% endif %}
             {% endfor %}
+            <br>
+            <p id="section2"> <small>[2] Para facilitar la compra y venta de monedas las cantidades se muestran sin redondear.</small> </p>
         {% endif %}
     </div>
-    <br>
-    <p id="section2"> <small>[2] Para facilitar la compra y venta de monedas las cantidades se muestran sin redondear.</small> </p>
+    
+    
 {% endblock %}
 
