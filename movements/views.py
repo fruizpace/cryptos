@@ -69,7 +69,7 @@ def validarConversion(amount, simbolo, convert):
         return error
     
     if simbolo != 'EUR' and monedero[simbolo] < float(amount):
-        error = 'Sólo dispones de {:.3f} {} para gastar.'.format(monedero[simbolo], simbolo)
+        error = 'Sólo dispone de {:.4f} {} para gastar. Consulte el monedero para ver la cantidad real.'.format(monedero[simbolo], simbolo)
         return error
     
     if simbolo == convert:
@@ -81,7 +81,7 @@ def validarConversion(amount, simbolo, convert):
         return error
     
     if simbolo != 'BTC' and convert == 'EUR':
-        error = 'Sólo puedes comprar EUR con BTC.'
+        error = 'Sólo puede comprar EUR con BTC.'
         return error
 
 @app.route('/')

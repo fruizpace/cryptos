@@ -82,7 +82,7 @@
     <div>
     <hgroup>
         <h2>Monedero: </h2>
-        <h3>¿Cuánto tienes de cada criptomoneda?</h3>
+        <h3>¿Cuánto tienes de cada criptomoneda? <a href="#section2" style="color: black;">[2]</a> </h3>
     </hgroup>
         {% if monedero == 'vacio' %}
             <p style="color:blue;"> <strong>Primera compra:</strong> Use Euros (EUR) para obtener Bitcoins (BTC). </p>
@@ -91,10 +91,12 @@
                 {% if cantidad == None %}
                     <!-- no hagas nada -->
                 {% elif cantidad > 0  %}
-                    <li> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"> {{moneda}} = {{ "{:.6f}".format(cantidad) }}</li>
+                    <li> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"  width="30px" height="30px"> {{moneda}} = {{cantidad}}</li>
                 {% endif %}
             {% endfor %}
         {% endif %}
     </div>
+    <br>
+    <p id="section2"> <small>[2] Para facilitar la compra y venta de monedas las cantidades se muestran sin redondear.</small> </p>
 {% endblock %}
 

@@ -88,14 +88,17 @@ tr:nth-child(even) {
     <div id='space_monedero'>
     <hgroup>
         <h2>Monedero: </h2>
-        <h3>¿Cuánto tienes de cada criptomoneda?</h3>
+        <h3>¿Cuánto tienes de cada criptomoneda? <a href="#section1" style="color: black;">[1]</a></h3>
     </hgroup>
             {% for moneda, cantidad in monedero.items() %}
                 {% if cantidad == None %}
-                    <p> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"> {{moneda}} = 0 </p>
+                    <p> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"  width="30px" height="30px"> {{moneda}} = 0 </p>
                 {% elif cantidad > 0 %}
-                    <li> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"> {{moneda}} = {{ "{:,.4f}".format(cantidad) }}</li>
+                    <li> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda" title="{{cantidad}}" width="30px" height="30px"> {{moneda}} = {{ "{:,.4f}".format(cantidad) }}</li>
                 {% endif %}
             {% endfor %}
     </div>
+    <br>
+    <p id="section1"> <small>[1] Las cantidades se muestran redondeadas. 
+        Si coloca el cursor encima del icono de la criptomoneda de interés se le mostrará la cantidad sin redondear.</small> </p>
 {% endblock %}
