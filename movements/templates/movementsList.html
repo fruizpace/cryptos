@@ -52,55 +52,59 @@ tr:nth-child(even) {
 </div>
 
 <div>
-    {% if datos | length > 0 %}
-        <table class= tabla-movementsList>
-            <tr>
-                <th>Fecha</th>
-                <th>Hora</th>
-                <th>From</th>
-                <th>Q</th>
-                <th>To</th>
-                <th>Q</th>
-                <th>P.U.</th>
-            </tr>
-        {% for registro in datos %}
-            <tr>
-                <td>{{ registro['date'] }}</td>
-                <td>{{ registro['time'] }}</td>
-                <td>{{ registro['from_currency'] }}</td>
-                <td class='valores'>{{ "{:,.2f}".format(registro['from_quantity']) }}</td>
-                <td>{{ registro['to_currency'] }}</td>
-                <td class='valores'>{{ "{:,.2f}".format(registro['to_quantity']) }}</td>
-                <td class='valores'>{{ "{:,.4f}".format(registro['precio_unitario_to']) }}</td>
-            </tr>
-        {% endfor %}
-        </table>
+    {% if error != "" %}
+    <p style="color: red; text-align: center;"> {{error}} </p>
     {% else %}
-        <p style="text-align: center;"><mark background-color: yellow;>Sin movimientos.</mark></p>
-        <p style="text-align: center;"><mark background-color: yellow;>Por favor, realice su primera 
-            <a href="/purchase"> compra <i class="fa fa-plus" aria-hidden="true"></i></a>.</mark></p>
-    </div>
-    {% endif %}
-    
-    <div id='botones_incio'>
-    <a id='l' href="/status" role="button" title="Estado de la inversión"> Status </a> 
-    <a id='r' href="/purchase" role="button" title="Comprar moneda" > <i class="fa fa-plus" aria-hidden="true"></i></a> 
-    </div>
-    
-    <div id='space_monedero'>
-    <hgroup>
-        <h2>Monedero: </h2>
-        <h3>¿Cuánto tienes de cada criptomoneda? <a href="#section1" style="color: black;">[1]</a></h3>
-    </hgroup>
-            {% for moneda, cantidad in monedero.items() %}
-                {% if cantidad == None %}
-                    <p> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"  width="30px" height="30px"> {{moneda}} = 0 </p>
-                {% elif cantidad > 0 %}
-                    <li> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda" title="{{cantidad}}" width="30px" height="30px"> {{moneda}} = {{ "{:,.4f}".format(cantidad) }}</li>
-                {% endif %}
+        {% if datos | length > 0 %}
+            <table class= tabla-movementsList>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>From</th>
+                    <th>Q</th>
+                    <th>To</th>
+                    <th>Q</th>
+                    <th>P.U.</th>
+                </tr>
+            {% for registro in datos %}
+                <tr>
+                    <td>{{ registro['date'] }}</td>
+                    <td>{{ registro['time'] }}</td>
+                    <td>{{ registro['from_currency'] }}</td>
+                    <td class='valores'>{{ "{:,.2f}".format(registro['from_quantity']) }}</td>
+                    <td>{{ registro['to_currency'] }}</td>
+                    <td class='valores'>{{ "{:,.2f}".format(registro['to_quantity']) }}</td>
+                    <td class='valores'>{{ "{:,.4f}".format(registro['precio_unitario_to']) }}</td>
+                </tr>
             {% endfor %}
-    </div>
-    <br>
-    <p id="section1"> <small>[1] Las cantidades se muestran redondeadas. 
-        Si coloca el cursor encima del icono de la criptomoneda de interés se le mostrará la cantidad sin redondear.</small> </p>
+            </table>
+        {% else %}
+            <p style="text-align: center;"><mark background-color: yellow;>Sin movimientos.</mark></p>
+            <p style="text-align: center;"><mark background-color: yellow;>Por favor, realice su primera 
+                <a href="/purchase"> compra <i class="fa fa-plus" aria-hidden="true"></i></a>.</mark></p>
+        </div>
+        {% endif %}
+        
+        <div id='botones_incio'>
+        <a id='l' href="/status" role="button" title="Estado de la inversión"> Status </a> 
+        <a id='r' href="/purchase" role="button" title="Comprar moneda" > <i class="fa fa-plus" aria-hidden="true"></i></a> 
+        </div>
+        
+        <div id='space_monedero'>
+        <hgroup>
+            <h2>Monedero: </h2>
+            <h3>¿Cuánto tienes de cada criptomoneda? <a href="#section1" style="color: black;">[1]</a></h3>
+        </hgroup>
+                {% for moneda, cantidad in monedero.items() %}
+                    {% if cantidad == None %}
+                        <p> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda"  width="30px" height="30px"> {{moneda}} = 0 </p>
+                    {% elif cantidad > 0 %}
+                        <li> <img src="static/images/{{moneda}}.png" alt="icono criptomoneda" title="{{cantidad}}" width="30px" height="30px"> {{moneda}} = {{ "{:,.4f}".format(cantidad) }}</li>
+                    {% endif %}
+                {% endfor %}
+        </div>
+        <br>
+        <p id="section1"> <small>[1] Las cantidades se muestran redondeadas. 
+            Si coloca el cursor encima del icono de la criptomoneda de interés se le mostrará la cantidad sin redondear.</small> </p>
+    {% endif %}
 {% endblock %}

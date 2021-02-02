@@ -87,17 +87,29 @@ def validarConversion(amount, simbolo, convert):
 @app.route('/')
 def listaMovimientos(): # mostrar tabla SQL
     query = "SELECT date, time, from_currency, from_quantity, to_currency, to_quantity, from_quantity/to_quantity as precio_unitario_to FROM movements;"
-    compras = consulta(query)
-    monedero_actual = calc_monedero()
+    mensaje = ""
+    try:
+        compras = consulta(query)
+    except Exception as e:
+        print("**ERROR**: Acceso base de datos - {}".format(type(e).__name__))
+        mensaje = "Error en acceso a la base de datos. Consulte con el administrador."
+        return render_template('movementsList.html', error=mensaje)
     
-    return render_template('movementsList.html', datos=compras, monedero=monedero_actual)
+    monedero_actual = calc_monedero()
+    return render_template('movementsList.html', datos=compras, monedero=monedero_actual, error=mensaje)
 
 @app.route('/purchase', methods=['GET', 'POST'])
 def purchase():
     # 1) Formulario vacío:
     if request.method == 'GET':
         form_vacio = MovementForm()
-        monedero = calc_monedero()
+        try:
+            monedero = calc_monedero()
+        except Exception as e:
+            print("**ERROR**: Acceso base de datos - {}".format(type(e).__name__))
+            mensaje = "Error en acceso a la base de datos. Consulte con el administrador."
+            return render_template('movementsList.html', error=mensaje)
+        
         lista_from = ['EUR'] # crear una lista de monedas disponibles para FROM: EUR + las que tengan cantidad > 0 en mi monedero
         
         try:
@@ -113,8 +125,8 @@ def purchase():
     
     else: #2) request.method == 'POST': Grabar o Calcular
         form = MovementForm()
-        form.from_currency.choices = [request.form.get('from_currency')] # bloqueamos la lista con  la moneda elegida
-        form.to_currency.choices = [request.form.get('to_currency')] # bloqueamos la lista con  la moneda elegida
+        form.from_currency.choices = [request.form.get('from_currency')] # bloqueamos la lista FROM con  la moneda elegida
+        form.to_currency.choices = [request.form.get('to_currency')] # bloqueamos la lista TO con  la moneda elegida
         monedero = calc_monedero()
         
         if  request.form.get('submit') == 'Grabar' and form.validate():
@@ -125,7 +137,8 @@ def purchase():
                 
                 return redirect(url_for('listaMovimientos'))
             except:
-                return redirect(url_for('listaMovimientos'))
+                error = "Error: Debe efectuar el cálculo (botón calculadora) antes de validar la compra."
+                return render_template('purchase.html', form=form, vacio='yes', error=error, monedero=monedero)
         else:
             amount = request.form.get('from_quantity') # x "simbolo" convierte a "convert"
             simbolo = request.form.get('from_currency') 
@@ -148,14 +161,21 @@ def purchase():
                 
                 return render_template('purchase.html', vacio='no', form=form, q_to=q_to, precioUnitario=precioUnitario, hora_compra=hora_compra, fecha_compra=fecha_compra, monedero=monedero, amount=amount)
             except Exception as error:
-                #print(error) # Failed to establish a new connection
+                print("**ERROR**: Conexion url en PURCHASE - {}".format(type(error).__name__), error) # Failed to establish a new connection
+                error = "Problema de conexión. Contacte con el administrador."
                 return render_template('purchase.html', vacio='yes', form=form, error=error, monedero=monedero)
 
 @app.route('/status')
 def status():
     # 1)
     query1 = "SELECT SUM(from_quantity) as eur_from FROM movements WHERE from_currency='EUR';"
-    total_diccionario = consulta(query1)
+    try:
+        total_diccionario = consulta(query1)
+    except Exception as e:
+        print("**ERROR**: Acceso base de datos - {}".format(type(e).__name__))
+        mensaje = "Error en acceso a la base de datos. Consulte con el administrador."
+        return render_template('movementsList.html', error=mensaje)
+    
     total_eur_invertido = total_diccionario[0]['eur_from'] 
     
     #2)
@@ -167,11 +187,13 @@ def status():
     simbolo = "BTC,ETH,XRP,LTC,BCH,BNB,USDT,EOS,BSV,XLM,ADA,TRX" # no debe tener espacios en blanco!
     convert = 'EUR'
     
+    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol={}&convert={}&CMC_PRO_API_KEY={}'.format(simbolo, convert, API_KEY)
     try:
-        url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol={}&convert={}&CMC_PRO_API_KEY={}'.format(simbolo, convert, API_KEY)
         dicc = peticionAPI(url)
     except Exception as error:
-        return render_template('status.html', error_conexion = error)
+        print("**ERROR**: Conexion url en STATUS - {}".format(type(error).__name__), error)
+        error = "Problemas de conexión. Contacte con el administrador."
+        return render_template('status.html', invertido=0 , actual=0, error_conexion = error)
     
     lista_monedas = ['BTC', 'ETH', 'XRP', 'LTC', 'BCH','BNB', 'USDT','EOS','BSV','XLM','ADA','TRX']
     pu_crypto_eur = {}
