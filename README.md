@@ -3,30 +3,30 @@ title: Proyecto Flask
 author: Fiorella Ruiz
 ---
 # Proyecto Flask: Simulador de cryptos 
-## Instrucciones de instalación 
+## Instrucciones de instalación de dependencias
 
 ### Desde Visual Studio + Windows:
 *Nota: Asumimos que tienes instalado Git y SQLITE3 en tu sistema local.*
 1. Crea una carpeta de trabajo.
-2. Desde Visual Studio y dentro de la carpeta de trabajo abre una nueva terminal e instala el entorno virtual: ```python -m venv venv``` . Ojo, Si no funciona probar con *python3*.
+2. Desde Visual Studio y dentro de la carpeta de trabajo abre una nueva terminal e instala el entorno virtual: ```python -m venv venv``` (Ojo, si no funciona probar con ```python3 -m venv venv```).
 3. Activa el entorno virtual: ```venv\Scripts\activate```
 4. Copia la URL del respositorio remoto usando el icono "Copy to clipboard" y clona el repositorio con el siguiente comando:  ```git clone https://github.com/fruizpace/cryptos.git ```. Se descargará la carpeta cryptos con todos los archivos necesarios.
 5. Dentro de la carpeta cryptos ejecutar el comando: ```pip install -r requirements.txt``` para instalar todas las librerías necesarias para la aplicación.
-6. En la carpeta Cryptos crear un archivo .env y escribir dentro las variables de entorno: 
+6. En la carpeta Cryptos crea un archivo **.env** y escribe dentro las variables de entorno: 
 - FLASK_APP=run.py
 - FLASK_ENV=development
-7. En la carpeta Cryptos crear un archivo config.py basado en config_template.py y reemplaza cada contenido de las variables de entorno: 
-- 'pon aquí tu clave para CSRF' --> '&Gw&fpt#2JT?#ag'
+7. En la carpeta Cryptos crear un archivo de configuración **config.py** que contenga lo mismo que config_template.py y reemplaza cada contenido de las variables de entorno: 
+- 'pon aquí tu clave para CSRF' -->  crea tu propia clave entre comillas
 - 'ruta de mi base de datos db' --> 'movements/data/basededatos.db'
-- 'clave para acceder al API de currencymarket'  -->  '1f7a2e8f-a55d-4bf2-895d-d26e6dd0488c'
-8.  Para crear la base de datos, entra en las carpetas movements/data y en el terminal escribe los comandos:
+- 'clave para acceder al API de currencymarket'  -->  obtenten tu clave en https://coinmarketcap.com/api/ y la enganchas entre comillas.
+8.  Para crear la base de datos entra en las carpetas *movements/data* y en el terminal escribe los comandos:
 ```
 > sqlite3 basededatos.db
 > .read migrations/initial.sql
 > .schema
 > .q
 ```
-9. Finalmente, vuelve a la carpeta Cryptos y escribe en el terminal: ```flask run```
+1. Finalmente, vuelve a la carpeta Cryptos y escribe en el terminal: ```flask run```
 
 ## Sobre la aplicación:
 
